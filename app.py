@@ -28,7 +28,7 @@ def get_all_users():
     """
     Gets all users
     """
-    return success_response({"users": [u.serialize() for u in Users.query.all()] })
+    return success_response({"users": [u.serialize() for u in User.query.all()] })
 
 @app.route("/api/users/<int:user_id>/")
 def get_specific_user(user_id):
@@ -103,9 +103,21 @@ def create_movie():
     Creates a new movie 
     """
 
-#get all movies
+@app.route("/api/movies/", methods=["GET"])
+def get_all_movies():
+    """
+    Gets all movies
+    """
+    return success_response({"movies": [m.serialize() for m in Movie.query.all()] })
 
-#get all events
+
+# -- event routes ----------
+@app.route("/api/events/", methods=["GET"])
+def get_all_events():
+    """
+    Gets all events
+    """
+    return success_response({"events": [e.serialize() for e in Event.query.all()] })
 
     
 
