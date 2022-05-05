@@ -2,8 +2,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-association_table = db.Table(
-    "association",
+watched_table = db.Table(
+    "watched_table",
     db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
     db.Column("movie_id", db.Integer, db.ForeignKey("movies.id"))
 )
@@ -12,6 +12,12 @@ interested_table = db.Table(
     "interested_table",
     db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
     db.Column("movie_id", db.Integer, db.ForeignKey("movies.id"))
+)
+
+events_hosted_table = db.Table(
+    "events_hosted_table",
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
+    db.Column("movie_id", db.Integer, db.ForeignKey("events.id"))
 )
 
 events_interested_table = db.Table(
@@ -33,15 +39,14 @@ class Users(db.Model):
     username = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
     movies_watched = db.relationship(
-        "Movies", secondary=association_table, back_populates="users_watched")
+        "Movies", secondary=watched_table, back_populates="users_watched", cascade="delete")
+    movies_interested = db.relationship(
+        "Movies", secondary=interested_table, back_populates="users_interested", cascade="delete")
+
     movies_hosted = db.relationship(
-        "Events", back_populates="host", cascade="delete")
-    interested = db.relationship(
-        "Movies", secondary=interested_table,
-        back_populates="users_interested")
+        "Events", secondary=events_hosted_table, back_populates="host", cascade="delete")
     events_interested = db.relationship(
-        "Events", secondary=events_interested_table,
-        back_populates="users_interested")
+        "Events", secondary=events_interested_table, back_populates="users_interested", cascade="delete")
 
     def __init__(self, **kwargs):
         """
@@ -73,11 +78,28 @@ class Movies(db.Model):
     rating = db.Column(db.Integer)
     description = db.Column(db.String, nullable=False)
     users_watched = db.relationship(
-        'Users', secondary=association_table, back_populates="movies_watched")
+        'Users', secondary=watched_table, back_populates="movies_watched")
     users_interested = db.relationship(
-        'Users', secondary=interested_table, back_populates="interested")
+        'Users', secondary=interested_table, back_populates="movies_interested")
 
-# Events Models
+    def __init__(self, **kwargs):
+        """
+        Method to initialize a new movie database entry
+        """
+        self.name = kwargs.get("name", "")
+        self.rating = kwargs.get("rating", 0)
+        self.description = kwargs.get("description", "")
+
+    def serialize(self):
+        """
+        Return a serialized representation of a movie database entry
+        """
+        return {
+            "id": self.id,
+            "name": self.name,
+            "rating": self.rating,
+            "description": self.description
+        }
 
 
 class Events(db.Model):
@@ -90,9 +112,31 @@ class Events(db.Model):
     __tablename__ = "events"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
-    host_id = db.Column(db.Integer, db.ForeignKey(
-        "users.id"))
+    location = db.Column(db.String, nullable=False)
+    start = db.Column(db.DateTime, nullable=False)
+    duration = db.Column(db.DateTime, nullable=False)
     host = db.relationship(
-        "Users", back_populates="movies_hosted", cascade="delete")
+        "Users", secondary = events_hosted_table, back_populates="movies_hosted", cascade="delete")
     users_interested = db.relationship(
-        'Users', secondary=events_interested_table, back_populates="events_interested")
+        'Users', secondary=events_interested_table, back_populates="events_interested", cascade="delete")
+
+    def __init__(self, **kwargs):
+        """
+        Method to initialize a new event database entry
+        """
+        self.name = kwargs.get("name", "")
+        self.location = kwargs.get("location", "")
+        self.start = kwargs.get("start")
+        self.duration = kwargs.get("duration")
+
+    def serialize(self):
+        """
+        Returns a serialized version of the event database entry
+        """
+        return {
+            "id": self.id,
+            "name": self.name,
+            "location": self.location,
+            "start": self.start,
+            "duration": self.duration
+        }
