@@ -27,7 +27,7 @@ events_interested_table = db.Table(
 )
 
 
-class Users(db.Model):
+class User(db.Model):
     """
     A class to model the users database for the movie app
     Has a many to many relationship with Movies (movies watched)
@@ -66,7 +66,7 @@ class Users(db.Model):
         }
 
 
-class Movies(db.Model):
+class Movie(db.Model):
     """
     A class to model the movies database for the movie app
     Has a many-to-many relationship with Users (movie -> users_watched)
@@ -102,7 +102,7 @@ class Movies(db.Model):
         }
 
 
-class Events(db.Model):
+class Event(db.Model):
     """
     A class to model all events-
     Cornell Cinema movies as well as Community movies.

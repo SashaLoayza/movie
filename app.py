@@ -1,4 +1,4 @@
-from db import db, Users, Movies, Events
+from db import db, User, Movie, Event
 from flask import Flask, request
 import json
 
@@ -10,22 +10,19 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///%s" % db_filename
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = False
 
+# -- initializes app ----------
 db.init_app(app)
 with app.app_context():
     db.create_all()
 
+# -- generalized responses ----------
 def success_response(data, code=200):
-    """
-    Returns a successful response
-    """
     return json.dumps(data), code
 
 def failure_response(message, code=404):
-    """
-    Returns a failed response
-    """
     return json.dumps({"error": message}), code
 
+# -- users routes ----------
 @app.route("/api/users/")
 def get_all_users():
     """
@@ -38,7 +35,7 @@ def get_specific_user(user_id):
     """
     Gets a user by its user_id
     """
-    user = Users.query.filter_by(id=user_id).first()
+    user = User.query.filter_by(id=user_id).first()
     if user is None:
         return failure_response("User not found")
     return success_response(user.serialize())
@@ -53,7 +50,7 @@ def create_user():
     password = body.get("password")
     if username is None or password is None:
         return failure_response("Username or password wasn't provided", 400)
-    new_user = Users(username=username, pasword=password)
+    new_user = User(username=username, pasword=password)
     db.session.add(new_user)
     db.session.commit()
     serialized_user = new_user.serialize()
@@ -70,7 +67,7 @@ def edit_username(user_id):
     """
     body = json.loads(request.data)
     new_username = body.get("username")
-    user = Users.query.filter_by(id=user_id).first()
+    user = User.query.filter_by(id=user_id).first()
     if user is None:
         return failure_response("User not found")
     user.username = new_username 
@@ -82,20 +79,20 @@ def delete_user(user_id):
     """
     Deletes a user
     """
-    user = Users.query.filter_by(id=user_id).first()
+    user = User.query.filter_by(id=user_id).first()
     if user is None:
         return failure_response("User not found")
     db.session.delete(user)
     db.session.commit()
     return success_response(user.serialize())
 
-
+# -- movie routes ----------
 @app.route("/api/movies/<int:movie_id>/", methods=["POST"])
 def get_specific_movie(movie_id):
     """
     Get a movie by its id
     """
-    movie = Movies.query.filter_by(id=movie_id).first()
+    movie = Movie.query.filter_by(id=movie_id).first()
     if movie is None:
         return failure_response("Movie not found")
     return success_response(movie.serialize())
@@ -105,6 +102,11 @@ def create_movie():
     """
     Creates a new movie 
     """
+
+#get all movies
+
+#get all events
+
     
 
 
