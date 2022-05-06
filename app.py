@@ -146,7 +146,7 @@ def _edit_user_value(value_to_change, user_id, is_username):
     else:
         user.password = value_to_change
     db.session.commit() 
-    return success_response(user.serialize())
+    return success_response(user.serialize(), 201)
 
 # -- movie routes ----------
 @app.route("/api/movies/")
@@ -181,6 +181,38 @@ def create_movie():
     db.session.add(new_movie)
     db.session.commit()
     return success_response(new_movie.serialize(), 201)
+
+@app.route("/api/movies/<int:movie_id>/rating/", methods=["POST"])
+def edit_movie_rating(movie_id):
+    """
+    Edits a movies rating
+    """
+    body = json.loads(request.data)
+    rating = body.get("rating")
+    if rating is None:
+        return failure_response("Invalid request body")
+    movie = Movie.query.filter_by(id=movie_id).first()
+    if movie is None:
+        return failure_response("Movie not found")
+    movie.rating = rating
+    db.session.commit()
+    return success_response(movie.serialize(), 201)
+
+@app.route("/api/movies/<int:movie_id>/description/", methods=["POST"])
+def edit_movie_description(movie_id):
+    """
+    Edits a movies description
+    """
+    body = json.loads(request.data)
+    description = body.get("description")
+    if description is None:
+        return failure_response("Invalid request body")
+    movie = Movie.query.filter_by(id=movie_id).first()
+    if movie is None:
+        return failure_response("Movie not found")
+    movie.description = description
+    db.session.commit()
+    return success_response(movie.serialize(), 201)
 
 @app.route("/api/movies/<int:movie_id>/", methods=["DELETE"])
 def delete_movie(movie_id):
