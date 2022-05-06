@@ -1,4 +1,3 @@
-from pytest import fail
 from db import db, User, Movie, Event
 from flask import Flask, request
 import json
@@ -72,19 +71,6 @@ def edit_password(user_id):
     body = json.loads(request.data)
     return _edit_user_value(body.get("password"), user_id, False)
 
-def _edit_user_value(value_to_change, user_id, is_username):
-    """
-    Helper method to change a value in user associated with user_id
-    """
-    user = User.query.filter_by(id=user_id).first()
-    if user is None:
-        return failure_response("User not found")
-    if is_username:
-        user.username = value_to_change 
-    else:
-        user.password = value_to_change
-    db.session.commit() 
-    return success_response(user.serialize())
 
 @app.route("/api/users/<int:user_id>/add_movie/", methods=["POST"])
 def add_movie_to_user(user_id):
@@ -144,15 +130,31 @@ def delete_user(user_id):
     db.session.commit()
     return success_response(user.serialize())
 
+# -- helper methods for User routes --
+
+def _edit_user_value(value_to_change, user_id, is_username):
+    """
+    Helper method to change a value in user associated with user_id
+    """
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return failure_response("User not found")
+    if is_username:
+        user.username = value_to_change 
+    else:
+        user.password = value_to_change
+    db.session.commit() 
+    return success_response(user.serialize())
+
 # -- movie routes ----------
-@app.route("/api/movies/", methods=["GET"])
+@app.route("/api/movies/")
 def get_all_movies():
     """
     Gets all movies
     """
     return success_response({"movies": [m.serialize() for m in Movie.query.all()] })
 
-@app.route("/api/movies/<int:movie_id>/", methods=["POST"])
+@app.route("/api/movies/<int:movie_id>/")
 def get_specific_movie(movie_id):
     """
     Get a movie by its id
@@ -171,12 +173,12 @@ def create_movie():
     name = body.get("name")
     rating = body.get("rating")
     description = body.get("description")
-    if name is None or rating is None or description is None:
+    if name is None or not valid_rating(rating) or description is None:
         return failure_response("Invlaid request body")
     new_movie = Movie(name=name, rating=rating, description=description)
     db.session.add(new_movie)
     db.session.commit()
-    return success_response(new_movie, 201)
+    return success_response(new_movie.serialize(), 201)
 
 @app.route("/api/movies/<int:movie_id>/", methods=["DELETE"])
 def delete_movie(movie_id):
@@ -190,7 +192,18 @@ def delete_movie(movie_id):
     db.session.commit()
     return success_response(movie.serialize())
 
+# -- helper methods for movie routes --
 
+def valid_rating(rating):
+    """
+    Returns False if rating is number between 0 and 5, else False.
+    """
+    if isinstance(rating,(int, float)):
+        if 0 <= rating <= 5:
+            return True
+    return False
+    
+    
 # -- event routes ----------
 @app.route("/api/events/", methods=["GET"])
 def get_all_events():
@@ -198,8 +211,6 @@ def get_all_events():
     Gets all events
     """
     return success_response({"events": [e.serialize() for e in Event.query.all()] })
-
-    
 
 
 if __name__ == "__main__":
