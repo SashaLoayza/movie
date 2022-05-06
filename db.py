@@ -43,7 +43,7 @@ class User(db.Model):
     movies_interested = db.relationship(
         "Movies", secondary=interested_table, back_populates="users_interested", cascade="delete")
 
-    movies_hosted = db.relationship(
+    events_hosted = db.relationship(
         "Events", secondary=events_hosted_table, back_populates="host", cascade="delete")
     events_interested = db.relationship(
         "Events", secondary=events_interested_table, back_populates="users_interested", cascade="delete")
@@ -62,7 +62,10 @@ class User(db.Model):
         return {
             "id": self.id,
             "username": self.username,
-            "movies_watched": [m.serialize() for m in self.movies_watched]
+            "movies_watched": [m.serialize() for m in self.movies_watched],
+            "movies_interested": [m.serialize() for m in self.movies_interested],
+            "events_hosted": [e.serialize() for e in self.events_hosted],
+            "events_interested": [e.serialize() for e in self.events_interested]
         }
 
 
@@ -116,7 +119,7 @@ class Event(db.Model):
     start = db.Column(db.DateTime, nullable=False)
     duration = db.Column(db.DateTime, nullable=False)
     host = db.relationship(
-        "Users", secondary = events_hosted_table, back_populates="movies_hosted", cascade="delete")
+        "Users", secondary = events_hosted_table, back_populates="events_hosted", cascade="delete")
     users_interested = db.relationship(
         'Users', secondary=events_interested_table, back_populates="events_interested", cascade="delete")
 
