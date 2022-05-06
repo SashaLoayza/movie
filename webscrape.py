@@ -1,3 +1,4 @@
+from operator import le
 import requests
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
@@ -15,12 +16,27 @@ events_sp22=[BeautifulSoup(requests.get(link).text,'lxml') for link in links_sp2
 get_name = lambda event:event.find('h1',class_="pageTitle").text.strip()
 get_start = lambda event:datetime.fromisoformat(event.find('span',class_="date-display-single")['content'])
 def get_end(event,start: datetime):
-    delta_string=event.find('h3',class_="field-label",text="\n    Runtime  ").next_sibling.strip()
-    delta_dt=datetime.strptime(delta_string,"%H hr %M min")
+    dstring=event.find('h3',class_="field-label",text="\n    Runtime  ").next_sibling.strip()
+    h_index,m_index=dstring.find('h'),dstring.find('m')
+    if h_index!=-1 and m_index!=-1:
+        dstring=dstring.split(' ')
+        dstring = dstring[0]+':'+dstring[2]
+    elif h_index !=-1:
+        dstring = dstring[0]+':'+'0'
+    elif m_index !=-1:
+        dstring= '0:'+dstring[0]
+    else: dstring = '0:0'
+    delta_dt=datetime.strptime(dstring,"%H:%M")
     delta = timedelta(hours=delta_dt.hour,minutes=delta_dt.minute)
     return start+delta
 
-event_tuples_sp22 = [(get_name(event),get_start(event),get_end(event)) for event in events_sp22]
+# --each event tuple is (name of event, start datetime, end datetime)
+event_tuples_sp22 = []
+for event in events_sp22:
+    name = get_name(event)
+    start = get_start(event)
+    end = get_end(event, start)
+    event_tuples_sp22.append((name, start, end))
 
 
 

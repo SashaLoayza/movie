@@ -2,6 +2,7 @@ from db import db, User, Movie, Event
 from flask import Flask, request
 import json
 from datetime import datetime
+from webscrape import event_tuples_sp22
 
 app = Flask(__name__)
 
@@ -15,7 +16,10 @@ app.config["SQLALCHEMY_ECHO"] = False
 db.init_app(app)
 with app.app_context():
     db.create_all()
-
+    for event in event_tuples_sp22:
+        new_event = Event(name=event[0],location='Willard Straight Hall',start=event[1],end=event[2],host='Cornell Cinema')
+        db.session.add(new_event)
+        db.session.commit()
 # -- generalized responses ----------
 def success_response(data, code=200):
     return json.dumps(data), code

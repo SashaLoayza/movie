@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-import datetime
 
 db = SQLAlchemy()
 
@@ -135,7 +134,7 @@ class Event(db.Model):
         self.location = kwargs.get("location", "")
         self.start = kwargs.get("start")
         self.end = kwargs.get("end")
-
+        
     def serialize(self):
         """
         Returns a serialized version of the event database entry
