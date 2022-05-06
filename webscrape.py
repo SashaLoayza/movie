@@ -14,8 +14,12 @@ events_sp22=[BeautifulSoup(requests.get(link).text,'lxml') for link in links_sp2
 
 # -- helper methods to parse event page --
 get_name = lambda event:event.find('h1',class_="pageTitle").text.strip()
-get_start = lambda event:datetime.fromisoformat(event.find('span',class_="date-display-single")['content'])
-def get_end(event,start: datetime):
+get_starts = lambda event:[datetime.fromisoformat(e['content']) for e in event.find_all('span',class_="date-display-single")]
+
+
+def get_ends(event,starts: datetime):
+    """Returns list of all end times for a single event"""
+    # Construct the delta based on duration
     dstring=event.find('h3',class_="field-label",text="\n    Runtime  ").next_sibling.strip()
     h_index,m_index=dstring.find('h'),dstring.find('m')
     if h_index!=-1 and m_index!=-1:
@@ -28,15 +32,21 @@ def get_end(event,start: datetime):
     else: dstring = '0:0'
     delta_dt=datetime.strptime(dstring,"%H:%M")
     delta = timedelta(hours=delta_dt.hour,minutes=delta_dt.minute)
-    return start+delta
+    
+    ends=[] # return list of end times (in same order as start times list)
+    for start in starts:
+        ends.append(start+delta)
+    return ends
 
 # --each event tuple is (name of event, start datetime, end datetime)
 event_tuples_sp22 = []
 for event in events_sp22:
     name = get_name(event)
-    start = get_start(event)
-    end = get_end(event, start)
-    event_tuples_sp22.append((name, start, end))
+    starts = get_starts(event)
+    ends = get_ends(event, starts)
+    for i in range(len(starts)):
+        event_tuples_sp22.append((name, starts[i], ends[i]))
+        
 
 
 
