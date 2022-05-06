@@ -55,7 +55,7 @@ def create_user():
     db.session.commit()
     return success_response(new_user.serialize(), 201)
 
-@app.route("/api/users/<int:user_id>/", methods=["POST"])
+@app.route("/api/users/<int:user_id>/username/", methods=["POST"])
 def edit_username(user_id):
     """
     Edits a users username
@@ -63,7 +63,7 @@ def edit_username(user_id):
     body = json.loads(request.data)
     return _edit_user_value(body.get("username"), user_id, True)
 
-@app.route("/api/users/<int:user_id>/", methods=["POST"])
+@app.route("/api/users/<int:user_id>/password/", methods=["POST"])
 def edit_password(user_id):
     """
     Edits a users password
