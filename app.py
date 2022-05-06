@@ -62,7 +62,7 @@ def edit_username(user_id):
     Edits a users username
     """
     body = json.loads(request.data)
-    return _edit_user_value(body.get("username"), user_id)
+    return _edit_user_value(body.get("username"), user_id, True)
 
 @app.route("/api/users/<int:user_id>/", methods=["POST"])
 def edit_password(user_id):
@@ -70,16 +70,19 @@ def edit_password(user_id):
     Edits a users password
     """
     body = json.loads(request.data)
-    return _edit_user_value(body.get("password"), user_id)
+    return _edit_user_value(body.get("password"), user_id, False)
 
-def _edit_user_value(value_to_change, user_id):
+def _edit_user_value(value_to_change, user_id, is_username):
     """
     Helper method to change a value in user associated with user_id
     """
     user = User.query.filter_by(id=user_id).first()
     if user is None:
         return failure_response("User not found")
-    user.username = value_to_change 
+    if is_username:
+        user.username = value_to_change 
+    else:
+        user.password = value_to_change
     db.session.commit() 
     return success_response(user.serialize())
 

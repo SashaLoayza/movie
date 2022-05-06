@@ -39,14 +39,14 @@ class User(db.Model):
     username = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
     movies_watched = db.relationship(
-        "Movies", secondary=watched_table, back_populates="users_watched", cascade="delete")
+        "Movie", secondary=watched_table, back_populates="users_watched", cascade="delete")
     movies_interested = db.relationship(
-        "Movies", secondary=interested_table, back_populates="users_interested", cascade="delete")
+        "Movie", secondary=interested_table, back_populates="users_interested", cascade="delete")
 
     events_hosted = db.relationship(
-        "Events", secondary=events_hosted_table, back_populates="host", cascade="delete")
+        "Event", secondary=events_hosted_table, back_populates="host", cascade="delete")
     events_interested = db.relationship(
-        "Events", secondary=events_interested_table, back_populates="users_interested", cascade="delete")
+        "Event", secondary=events_interested_table, back_populates="users_interested", cascade="delete")
 
     def __init__(self, **kwargs):
         """
@@ -81,9 +81,9 @@ class Movie(db.Model):
     rating = db.Column(db.Integer)
     description = db.Column(db.String, nullable=False)
     users_watched = db.relationship(
-        'Users', secondary=watched_table, back_populates="movies_watched")
+        'User', secondary=watched_table, back_populates="movies_watched")
     users_interested = db.relationship(
-        'Users', secondary=interested_table, back_populates="movies_interested")
+        'User', secondary=interested_table, back_populates="movies_interested")
 
     def __init__(self, **kwargs):
         """
@@ -119,9 +119,9 @@ class Event(db.Model):
     start = db.Column(db.DateTime, nullable=False)
     duration = db.Column(db.DateTime, nullable=False)
     host = db.relationship(
-        "Users", secondary = events_hosted_table, back_populates="events_hosted", cascade="delete")
+        "User", secondary = events_hosted_table, back_populates="events_hosted", cascade="delete")
     users_interested = db.relationship(
-        'Users', secondary=events_interested_table, back_populates="events_interested", cascade="delete")
+        'User', secondary=events_interested_table, back_populates="events_interested", cascade="delete")
 
     def __init__(self, **kwargs):
         """
