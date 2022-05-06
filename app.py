@@ -47,10 +47,11 @@ def create_user():
     """
     body = json.loads(request.data)
     username = body.get("username")
+    name = body.get("name")
     password = body.get("password")
-    if username is None or password is None:
-        return failure_response("Username or password wasn't provided", 400)
-    new_user = User(username=username, pasword=password)
+    if username is None or password is None or name is None:
+        return failure_response("Username, name, or password wasn't provided", 400)
+    new_user = User(username=username, name = name, pasword=password)
     db.session.add(new_user)
     db.session.commit()
     return success_response(new_user.serialize(), 201)
