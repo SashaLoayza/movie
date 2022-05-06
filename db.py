@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+import datetime
 
 db = SQLAlchemy()
 
@@ -54,6 +55,7 @@ class User(db.Model):
         Method to initialize a new user database entry
         """
         self.username = kwargs.get("username", "")
+        self.name = kwargs.get("name", "")
         self.password = kwargs.get("password", "")
 
     def serialize(self):
@@ -63,6 +65,7 @@ class User(db.Model):
         return {
             "id": self.id,
             "username": self.username,
+            "name": self.name,
             "movies_watched": [m.serialize() for m in self.movies_watched],
             "movies_interested": [m.serialize() for m in self.movies_interested],
             "events_hosted": [e.serialize() for e in self.events_hosted],
@@ -118,7 +121,7 @@ class Event(db.Model):
     name = db.Column(db.String, nullable=False)
     location = db.Column(db.String, nullable=False)
     start = db.Column(db.DateTime, nullable=False)
-    duration = db.Column(db.DateTime, nullable=False)
+    end = db.Column(db.DateTime, nullable=False)
     host = db.relationship(
         "User", secondary = events_hosted_table, back_populates="events_hosted", cascade="delete")
     users_interested = db.relationship(
@@ -131,7 +134,7 @@ class Event(db.Model):
         self.name = kwargs.get("name", "")
         self.location = kwargs.get("location", "")
         self.start = kwargs.get("start")
-        self.duration = kwargs.get("duration")
+        self.end = kwargs.get("end")
 
     def serialize(self):
         """
@@ -141,6 +144,6 @@ class Event(db.Model):
             "id": self.id,
             "name": self.name,
             "location": self.location,
-            "start": self.start,
-            "duration": self.duration
+            "start": self.start.strftime('%m/%d/%Y %H:%M:%S'),
+            "end": self.end.strftime('%m/%d/%Y %H:%M:%S')
         }
