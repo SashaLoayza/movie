@@ -199,7 +199,22 @@ def get_all_events():
     """
     return success_response({"events": [e.serialize() for e in Event.query.all()] })
 
-    
+@app.route("/api/events/", methods=["POST"])
+def create_event():
+    """
+    Creates an event
+    """
+    body = json.loads(request.data)
+    name = body.get("name")
+    location = body.get("location")
+    start = body.get("start")
+    duration = body.get("duration")
+    if name is None or location is None or start is None or duration is None:
+        return failure_response("Invalid request body")
+    event = Event(name=name, location=location, start=start, duration=duration)
+    db.session.add(event)
+    db.session.commit()
+    return success_response(event.serialize(), 201)
 
 
 if __name__ == "__main__":
