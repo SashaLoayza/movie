@@ -23,6 +23,14 @@ def success_response(data, code=200):
 def failure_response(message, code=404):
     return json.dumps({"error": message}), code
 
+# -- base route ------------
+@app.route("/")
+def base_route():
+    """
+    Base endpoint
+    """
+    return "Welcome to our movie app!"
+
 # -- users routes ----------
 @app.route("/api/users/")
 def get_all_users():
