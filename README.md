@@ -10,25 +10,25 @@ The app is hosted on a Google Cloud Server under this IP address: http://34.124.
 API
 
 Users <br />
-    - Get all users
-    Get specific user
-    Create new user
-    Edit username
-    Edit password
-    Add a movie to a user
-    Add an event to a user
-    Delete user
-    Get user by username and password
+    - Get all users <br />
+    - Get specific user <br />
+    - Create new user <br />
+    - Edit username <br />
+    - Edit password <br />
+    - Add a movie to a user <br />
+    - Add an event to a user <br />
+    - Delete user <br />
+    - Get user by username and password <br />
 
-Movies
-    Get all movies
-    Create movie
-    Delete movie
-    Get specific movie
-    Edit movie rating
-    Edit movie description
+Movies <br />
+    - Get all movies <br />
+    - Create movie <br />
+    - Delete movie <br />
+    - Get specific movie <br />
+    - Edit movie rating <br />
+    - Edit movie description <br />
 
-Events
-    Get all events
-    Get specific events
-    Create an event
+Events <br />
+    - Get all events <br />
+    - Get specific eventsm<br />
+    - Create an event <br />
