@@ -2,6 +2,7 @@ from db import db, User, Movie, Event
 from flask import Flask, request
 import json
 from datetime import datetime
+from webscrape import event_tuples_sp22
 
 app = Flask(__name__)
 
@@ -15,7 +16,10 @@ app.config["SQLALCHEMY_ECHO"] = False
 db.init_app(app)
 with app.app_context():
     db.create_all()
-
+    for event in event_tuples_sp22:
+        new_event = Event(name=event[0],location='Willard Straight Hall',start=event[1],end=event[2],host='Cornell Cinema')
+        db.session.add(new_event)
+        db.session.commit()
 # -- generalized responses ----------
 def success_response(data, code=200):
     return json.dumps(data), code
@@ -48,6 +52,22 @@ def get_specific_user(user_id):
     if user is None:
         return failure_response("User not found")
     return success_response(user.serialize())
+
+@app.route("/api/users/login/",methods=["POST"])
+def user_login():
+    """
+    Gets a user by its username and password
+    """
+    body=json.loads(request.data)
+    username=body.get("username")
+    password=body.get("password")
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        return failure_response("User not found")
+    if password==user.password:
+        return success_response(user.serialize())
+    else: 
+        return failure_response("Incorrect password.")
 
 @app.route("/api/users/", methods=["POST"])
 def create_user():
