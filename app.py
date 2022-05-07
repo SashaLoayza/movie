@@ -1,8 +1,8 @@
-from src.db import db, User, Movie, Event
+from db import db, User, Movie, Event
 from flask import Flask, request
 import json
 from datetime import datetime
-from src.webscrape import event_tuples_sp22
+from webscrape import event_tuples_sp22
 
 app = Flask(__name__)
 
