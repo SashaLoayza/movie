@@ -45,6 +45,22 @@ def get_specific_user(user_id):
         return failure_response("User not found")
     return success_response(user.serialize())
 
+@app.route("/api/users/login/",methods=["POST"])
+def user_login():
+    """
+    Gets a user by its username and password
+    """
+    body=json.loads(request.data)
+    username=body.get("username")
+    password=body.get("password")
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        return failure_response("User not found")
+    if password==user.password:
+        return success_response(user.serialize())
+    else: 
+        return failure_response("Incorrect password.")
+
 @app.route("/api/users/", methods=["POST"])
 def create_user():
     """
