@@ -9,8 +9,8 @@ The app is hosted on a Google Cloud Server under this IP address: http://34.124.
 
 API
 
-Users
-    Get all users //
+Users <br />
+    Get all users
     Get specific user
     Create new user
     Edit username
